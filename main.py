@@ -1,10 +1,10 @@
 from flask import Flask, request, jsonify
-from mega import Mega
+from megapy import Mega
 import os
 
 app = Flask(__name__)
 
-# بيانات حساب MEGA (ضع بيانات حسابك هنا)
+# بيانات حساب MEGA
 MEGA_EMAIL = "your_email@example.com"
 MEGA_PASSWORD = "your_password"
 
@@ -25,7 +25,7 @@ def upload_file():
         return jsonify({"error": "لم يتم اختيار ملف"}), 400
 
     try:
-        # حفظ الملف مؤقتاً
+        # حفظ الملف مؤقتًا
         filepath = os.path.join("/tmp", file.filename)
         file.save(filepath)
 
@@ -35,7 +35,10 @@ def upload_file():
         # حذف الملف المؤقت
         os.remove(filepath)
 
-        return jsonify({"message": "تم رفع الملف بنجاح", "link": upload.get_public_url()})
+        # الحصول على رابط المشاركة
+        public_url = m.get_link(upload)
+
+        return jsonify({"message": "تم رفع الملف بنجاح", "link": public_url})
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
