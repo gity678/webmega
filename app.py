@@ -8,8 +8,8 @@ app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # استبدلها بمفتاح سري حقيقي
 
 # بيانات تسجيل الدخول إلى MEGA
-MEGA_EMAIL = 'your_mega_email@example.com'
-MEGA_PASSWORD = 'your_mega_password'
+MEGA_EMAIL = os.environ.get('MEGA_EMAIL')
+MEGA_PASSWORD = os.environ.get('MEGA_PASSWORD')
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
