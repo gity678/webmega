@@ -1,47 +1,51 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, render_template, redirect, url_for, flash
 from mega import Mega
+import requests
 import os
+import tempfile
 
 app = Flask(__name__)
+app.secret_key = 'your_secret_key'  # استبدلها بمفتاح سري حقيقي
 
-# بيانات حسابك في MEGA
-MEGA_EMAIL = "your_email@example.com"
-MEGA_PASSWORD = "your_password"
+# بيانات تسجيل الدخول إلى MEGA
+MEGA_EMAIL = 'your_mega_email@example.com'
+MEGA_PASSWORD = 'your_mega_password'
 
-@app.route("/")
-def home():
-    return "خدمة رفع الملفات إلى MEGA جاهزة"
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    if request.method == 'POST':
+        file_url = request.form.get('file_url')
+        if not file_url:
+            flash('الرجاء إدخال رابط الملف.')
+            return redirect(url_for('index'))
 
-@app.route("/upload", methods=["POST"])
-def upload_file():
-    if 'file' not in request.files:
-        return jsonify({"error": "لم يتم إرسال ملف"}), 400
+        try:
+            # تنزيل الملف مؤقتًا
+            response = requests.get(file_url, stream=True)
+            response.raise_for_status()
+            filename = file_url.split('/')[-1]
+            with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
+                for chunk in response.iter_content(chunk_size=8192):
+                    if chunk:
+                        tmp_file.write(chunk)
+                temp_file_path = tmp_file.name
 
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({"error": "لم يتم اختيار ملف"}), 400
+            # تسجيل الدخول إلى MEGA
+            mega = Mega()
+            m = mega.login(MEGA_EMAIL, MEGA_PASSWORD)
 
-    try:
-        # حفظ الملف مؤقتًا
-        filepath = os.path.join("/tmp", file.filename)
-        file.save(filepath)
+            # رفع الملف
+            uploaded_file = m.upload(temp_file_path, dest_filename=filename)
+            file_link = m.get_upload_link(uploaded_file)
 
-        # تسجيل الدخول ورفع الملف
-        mega = Mega()
-        m = mega.login(MEGA_EMAIL, MEGA_PASSWORD)
-        uploaded_file = m.upload(filepath)
+            # حذف الملف المؤقت
+            os.remove(temp_file_path)
 
-        # حذف الملف المحلي
-        os.remove(filepath)
+            flash(f'تم رفع الملف بنجاح. الرابط: {file_link}')
+            return redirect(url_for('index'))
 
-        # الحصول على رابط مشاركة الملف
-        public_url = m.get_upload_link(uploaded_file)
+        except Exception as e:
+            flash(f'حدث خطأ: {str(e)}')
+            return redirect(url_for('index'))
 
-        return jsonify({"message": "تم رفع الملف بنجاح", "link": public_url})
-
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    return render_template('index.html')
