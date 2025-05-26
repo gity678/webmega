@@ -1,4 +1,5 @@
-flask
+Flask
 mega.py==1.0.8
-requests
+pycryptodome
+tenacity==5.1.5
 
