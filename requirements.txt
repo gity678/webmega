@@ -1,5 +1,6 @@
 Flask
 mega.py==1.0.8
 pycryptodome
-tenacity==5.1.5
+tenacity==8.2.2
+
 
