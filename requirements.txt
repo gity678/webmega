@@ -1,5 +1,4 @@
 flask
 mega.py==1.0.8
 requests
-tenacity>=8.2.0
 
