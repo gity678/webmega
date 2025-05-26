@@ -1,55 +1,45 @@
-from flask import Flask, request, render_template_string
+from flask import Flask, request, jsonify
 from mega import Mega
-import requests
 import os
 
 app = Flask(__name__)
 
-# بيانات تسجيل الدخول لحساب MEGA - استبدلها بحسابك
-MEGA_EMAIL = 'your_email@example.com'
-MEGA_PASSWORD = 'your_password'
+# بيانات حساب MEGA (ضع بيانات حسابك هنا)
+MEGA_EMAIL = "your_email@example.com"
+MEGA_PASSWORD = "your_password"
 
-@app.route('/', methods=['GET', 'POST'])
-def upload_to_mega():
-    message = ''
-    if request.method == 'POST':
-        file_url = request.form.get('file_url')
-        if file_url:
-            try:
-                # تحميل الملف مؤقتاً
-                local_filename = file_url.split('/')[-1]
-                r = requests.get(file_url, stream=True)
-                with open(local_filename, 'wb') as f:
-                    for chunk in r.iter_content(chunk_size=8192):
-                        if chunk:
-                            f.write(chunk)
+mega = Mega()
+m = mega.login(MEGA_EMAIL, MEGA_PASSWORD)
 
-                # تسجيل الدخول إلى MEGA
-                mega = Mega()
-                m = mega.login(MEGA_EMAIL, MEGA_PASSWORD)
+@app.route("/")
+def home():
+    return "خدمة رفع الملفات إلى MEGA جاهزة"
 
-                # رفع الملف
-                m.upload(local_filename)
+@app.route("/upload", methods=["POST"])
+def upload_file():
+    if 'file' not in request.files:
+        return jsonify({"error": "لم يتم إرسال ملف"}), 400
 
-                # حذف الملف المحلي بعد الرفع
-                os.remove(local_filename)
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"error": "لم يتم اختيار ملف"}), 400
 
-                message = f'تم رفع الملف {local_filename} إلى حساب MEGA بنجاح!'
-            except Exception as e:
-                message = f'حدث خطأ: {str(e)}'
-        else:
-            message = 'يرجى إدخال رابط ملف صالح.'
+    try:
+        # حفظ الملف مؤقتاً
+        filepath = os.path.join("/tmp", file.filename)
+        file.save(filepath)
 
-    # واجهة بسيطة جداً
-    html = '''
-    <h2>رفع ملف إلى MEGA من رابط</h2>
-    <form method="post">
-      رابط الملف: <input type="text" name="file_url" style="width:300px;" required>
-      <button type="submit">ارفع</button>
-    </form>
-    <p>{{ message }}</p>
-    '''
-    return render_template_string(html, message=message)
+        # رفع الملف إلى MEGA
+        upload = m.upload(filepath)
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080)
+        # حذف الملف المؤقت
+        os.remove(filepath)
+
+        return jsonify({"message": "تم رفع الملف بنجاح", "link": upload.get_public_url()})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
