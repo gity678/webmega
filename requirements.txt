@@ -1,6 +1,7 @@
-Flask==2.3.3
-mega.py==1.0.8
-requests==2.32.3
+
+Flask
+requests
+mega.py
 
 
 
