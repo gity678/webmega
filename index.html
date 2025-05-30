@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html dir="rtl" lang="ar">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>مولد الكلمات</title>
+  <title>Word Formatter</title>
   <style>
     body {
       font-family: Arial;
@@ -54,14 +54,14 @@
 </head>
 <body>
 
-  <h2>أدخل 4 كلمات:</h2>
+  <h2>Enter 4 Words:</h2>
   <div class="inputs">
-    <input type="text" id="w1" placeholder="الكلمة 1">
-    <input type="text" id="w2" placeholder="الكلمة 2">
-    <input type="text" id="w3" placeholder="الكلمة 3">
-    <input type="text" id="w4" placeholder="الكلمة 4">
+    <input type="text" id="w1" placeholder="Word 1">
+    <input type="text" id="w2" placeholder="Word 2">
+    <input type="text" id="w3" placeholder="Word 3">
+    <input type="text" id="w4" placeholder="Word 4">
   </div>
-  <button onclick="generate()">عرض النتيجة</button>
+  <button onclick="generate()">Generate Result</button>
 
   <div id="output-container"></div>
 
@@ -76,14 +76,14 @@
       const container = document.getElementById('output-container');
       container.innerHTML = `
         <div class="result-box" id="result">${result}</div>
-        <button class="copy-btn" onclick="copyResult()">📋 نسخ</button>
+        <button class="copy-btn" onclick="copyResult()">📋 Copy</button>
       `;
     }
 
     function copyResult() {
       const text = document.getElementById("result").innerText;
       navigator.clipboard.writeText(text).then(() => {
-        alert("تم النسخ!");
+        alert("Copied to clipboard!");
       });
     }
   </script>
