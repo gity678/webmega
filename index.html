@@ -2,32 +2,89 @@
 <html dir="rtl" lang="ar">
 <head>
   <meta charset="UTF-8">
-  <title>معالج الكلمات</title>
+  <title>مولد الكلمات</title>
   <style>
-    body { font-family: Arial; text-align: center; padding: 20px; }
-    input, button { margin: 5px; padding: 10px; font-size: 16px; }
-    #result { margin-top: 20px; font-weight: bold; color: green; }
+    body {
+      font-family: Arial;
+      text-align: center;
+      padding: 30px;
+    }
+    .inputs {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    input {
+      padding: 10px;
+      font-size: 16px;
+      width: 100px;
+      text-align: center;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #output-container {
+      margin-top: 20px;
+    }
+    .result-box {
+      background-color: #f0f0f0;
+      padding: 10px;
+      font-size: 18px;
+      margin: 10px auto;
+      width: fit-content;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      display: inline-block;
+    }
+    .copy-btn {
+      margin-top: 5px;
+      cursor: pointer;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
 
   <h2>أدخل 4 كلمات:</h2>
-  <input type="text" id="w1" placeholder="الكلمة 1">
-  <input type="text" id="w2" placeholder="الكلمة 2"><br>
-  <input type="text" id="w3" placeholder="الكلمة 3">
-  <input type="text" id="w4" placeholder="الكلمة 4"><br>
+  <div class="inputs">
+    <input type="text" id="w1" placeholder="الكلمة 1">
+    <input type="text" id="w2" placeholder="الكلمة 2">
+    <input type="text" id="w3" placeholder="الكلمة 3">
+    <input type="text" id="w4" placeholder="الكلمة 4">
+  </div>
   <button onclick="generate()">عرض النتيجة</button>
 
-  <div id="result"></div>
+  <div id="output-container"></div>
 
   <script>
     function generate() {
-      let w1 = document.getElementById('w1').value;
-      let w2 = document.getElementById('w2').value;
-      let w3 = document.getElementById('w3').value;
-      let w4 = document.getElementById('w4').value;
-      let result = `${w1}:${w2}@${w3}:${w4}`;
-      document.getElementById('result').innerText = "النتيجة: " + result;
+      const w1 = document.getElementById('w1').value.trim();
+      const w2 = document.getElementById('w2').value.trim();
+      const w3 = document.getElementById('w3').value.trim();
+      const w4 = document.getElementById('w4').value.trim();
+      const result = `${w1}:${w2}@${w3}:${w4}`;
+
+      const container = document.getElementById('output-container');
+      container.innerHTML = `
+        <div class="result-box" id="result">${result}</div>
+        <button class="copy-btn" onclick="copyResult()">📋 نسخ</button>
+      `;
+    }
+
+    function copyResult() {
+      const text = document.getElementById("result").innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        alert("تم النسخ!");
+      });
     }
   </script>
 
