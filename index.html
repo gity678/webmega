@@ -27,7 +27,7 @@
       justify-content: center;
       gap: 20px;
       flex-wrap: wrap;
-      margin-bottom: 50px; /* زادت المسافة هنا */
+      margin-bottom: 50px;
     }
     input {
       padding: 16px;
@@ -90,13 +90,12 @@
 </head>
 <body>
 
-  <h2>Enter 4 Words:</h2>
+  <h2>Enter 3 Words:</h2>
 
   <div class="inputs">
     <input type="text" id="w1" placeholder="Word 1">
     <input type="text" id="w2" placeholder="Word 2">
     <input type="text" id="w3" placeholder="Word 3">
-    <input type="text" id="w4" placeholder="Word 4">
   </div>
 
   <button onclick="generate()">Generate Result</button>
@@ -108,8 +107,7 @@
       const w1 = document.getElementById('w1').value.trim();
       const w2 = document.getElementById('w2').value.trim();
       const w3 = document.getElementById('w3').value.trim();
-      const w4 = document.getElementById('w4').value.trim();
-      const result = `${w1}:${w2}@${w3}:${w4}`;
+      const result = `${w1}:1-65535@${w2}:${w3}`;
 
       const container = document.getElementById('output-container');
       container.innerHTML = `
